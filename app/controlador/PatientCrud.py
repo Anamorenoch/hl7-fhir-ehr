@@ -30,7 +30,7 @@ def WritePatient(patient_dict: dict):
 
 def GetPatientByIdentifier(patientSystem,patientValue):
     try:
-        patient = collection.find_one({"identifier.system":patientSystem,"indentifier.value":patientValue})
+        patient = collection.find_one({"identifier.system":patientSystem,"identifier.value":patientValue})
         print("Patient Retornado:",patient)
         if patient:
             patient["_id"] = str(patient["_id"])
