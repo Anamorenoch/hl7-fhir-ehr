@@ -43,6 +43,16 @@ async def add_patient(request: Request):
         return {"_id":patient_id}  # Return patient id
     else:
         raise HTTPException(status_code=500, detail=f"Validating error: {status}")
+        
+@app.post("/appointment", response_model=dict)
+async def add_appointment(request: Request):
+    new_appointment_dict = dict(await request.json())
+    status, appointment_id = WriteAppointment(new_appointment_dict)
+    if status == 'success':
+        return {"_id": appointment_id}  # Retorna el ID de la cita
+    else:
+        raise HTTPException(status_code=500, detail=f"Error de validación: {status}")
+
 
 if __name__ == '__main__':
     import uvicorn
