@@ -10,6 +10,7 @@ def WriteAppointment(appointment_dict: dict):
         # Validar que cumple el formato FHIR
         appointment = Appointment.model_validate(appointment_dict)
     except Exception as e:
+        print("Error validando appointment:", e)
         return f"errorValidating: {str(e)}", None
 
     # Convertir a diccionario limpio y guardar en MongoDB
