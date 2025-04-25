@@ -6,18 +6,6 @@ import json
 # Conectar a la colección de encounters en MongoDB
 collection = connect_to_mongodb("Encounter", "Consulta")
 
-# Función para obtener un Encounter por su ID
-def GetEncounterById(encounter_id: str):
-    try:
-        encounter = collection.find_one({"_id": ObjectId(encounter_id)})
-        if encounter:
-            encounter["_id"] = str(encounter["_id"])  # Convertir ObjectId a string
-            return "success", encounter
-        return "notFound", None
-    except Exception as e:
-        return f"error encontrado: {str(e)}", None
-
-# Función para insertar un Encounter en MongoDB
 def WriteEncounter(encounter_dict: dict):
     try:
         # Validar el Encounter con el modelo de FHIR
@@ -25,8 +13,19 @@ def WriteEncounter(encounter_dict: dict):
     except Exception as e:
         return f"errorValidating: {str(e)}", None
 
+    # Asegurarse de que 'class' sea una lista
+    if not isinstance(encounter_dict.get('class'), list):
+        encounter_dict['class'] = [encounter_dict['class']]
+
+    # Asegurarse de que 'period' tenga el formato adecuado
+    if 'period' in encounter_dict:
+        encounter_dict['period'] = {
+            'start': encounter_dict['period'].get('start'),
+            'end': encounter_dict['period'].get('end')
+        }
+
     # Convertir el encounter validado a JSON
-    validated_encounter_json = enc.model_dump()
+    validated_encounter_json = encounter_dict  # No es necesario volver a validar si ya pasaron las validaciones
 
     try:
         # Insertar el encounter en MongoDB
@@ -38,14 +37,3 @@ def WriteEncounter(encounter_dict: dict):
             return "errorInserting", None
     except Exception as e:
         return f"errorInserting: {str(e)}", None
-
-# Función para obtener un Encounter por identificador (opcional)
-def GetEncounterByIdentifier(encounterSystem, encounterValue):
-    try:
-        encounter = collection.find_one({"identifier.system": encounterSystem, "identifier.value": encounterValue})
-        if encounter:
-            encounter["_id"] = str(encounter["_id"])  # Convertir ObjectId a string
-            return "success", encounter
-        return "notFound", None
-    except Exception as e:
-        return f"error encontrado: {str(e)}", None
