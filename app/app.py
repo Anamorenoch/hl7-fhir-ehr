@@ -57,13 +57,16 @@ async def add_appointment(request: Request):
 
 @app.post("/encounter", response_model=dict)
 async def add_encounter(request: Request):
-    new_encounter_dict = dict(await request.json())
-    status, encounter_id = WriteEncounter(new_encounter_dict)
-    if status == 'success':
-        return {"_id": encounter_id}  # Retorna el ID del encuentro
-    else:
-        raise HTTPException(status_code=500, detail=f"Error de validación: {status}")
-
+    try:
+        new_encounter_dict = dict(await request.json())
+        status, encounter_id = WriteEncounter(new_encounter_dict)
+        if status == 'success':
+            return {"_id": encounter_id}  # Retorna el ID del encuentro
+        else:
+            raise HTTPException(status_code=500, detail=f"Error de validación: {status}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+        
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
