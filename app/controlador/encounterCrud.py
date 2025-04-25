@@ -5,16 +5,6 @@ from fhir.resources.encounter import Encounter
 # Conectarse a la colección "encounters"
 encounter_collection = connect_to_mongodb("Encounter", "Consulta")
 
-def GetEncounterById(encounter_id: str):
-    try:
-        encounter = encounter_collection.find_one({"_id": ObjectId(encounter_id)})
-        if encounter:
-            encounter["_id"] = str(encounter["_id"])
-            return "success", encounter
-        return "notFound", None
-    except Exception as e:
-        return "notFound", None
-
 def WriteEncounter(encounter_dict: dict):
     try:
         # Validar el recurso HL7 FHIR tipo Encounter
