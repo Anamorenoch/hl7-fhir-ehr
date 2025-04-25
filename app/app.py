@@ -8,7 +8,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://hl7-patient-write-ana-006.onrender.com","https://hl7-appointment-write.onrender.com"],  # Permitir solo este dominio
+    allow_origins=["https://hl7-patient-write-ana-006.onrender.com","https://hl7-appointment-write.onrender.com","https://hl7-encounter-write.onrender.com"],  # Permitir solo este dominio
     allow_credentials=True,
     allow_methods=["*"],  # Permitir todos los métodos (GET, POST, etc.)
     allow_headers=["*"],  # Permitir todos los encabezados
@@ -54,6 +54,14 @@ async def add_appointment(request: Request):
     else:
         raise HTTPException(status_code=500, detail=f"Error de validación: {status}")
 
+@app.post("/encounter", response_model=dict)
+async def add_encounter(request: Request):
+    new_encounter_dict = dict(await request.json())
+    status, encounter_id = WriteEncounter(new_encounter_dict)
+    if status == 'success':
+        return {"_id": encounter_id}  # Retorna el ID del encuentro
+    else:
+        raise HTTPException(status_code=500, detail=f"Error de validación: {status}")
 
 if __name__ == '__main__':
     import uvicorn
