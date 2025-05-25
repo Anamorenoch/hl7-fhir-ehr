@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 import uvicorn
 from app.controlador.PatientCrud import GetPatientById,WritePatient,GetPatientByIdentifier
-from app.controlador.appointmentCrud import WriteAppointment,GetAppointmentsByStart
+from app.controlador.appointmentCrud import WriteAppointment,collection
 from app.controlador.encounterCrud import WriteEncounter
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -57,11 +57,12 @@ async def add_appointment(request: Request):
         
 @app.get("/appointment")
 async def get_appointments(start: str):
-    citas = GetAppointmentsByStart(start)
-    if citas:
-        return {"entry": citas}
-    else:
-        return {"entry": []}
+    print("Recibida solicitud con start:", start)
+    resultado = collection.find_one({"start": start})
+    if not resultado:
+        return JSONResponse(content={"entry": []})  # respuesta vacía válida
+    return JSONResponse(content={"entry": [convert_bson(resultado)]})
+
 
 @app.post("/encounter", response_model=dict)
 async def add_encounter(request: Request):
