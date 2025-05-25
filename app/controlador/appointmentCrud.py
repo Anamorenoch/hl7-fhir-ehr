@@ -15,19 +15,24 @@ def WriteAppointment(appointment_dict: dict):
         print("Error validando appointment:", e)
         return f"errorValidating: {str(e)}", None
 
-    # Convertir la hora 'start' a datetime en UTC
+    # Convertir 'start' a datetime en UTC
     start_time_str = appointment_dict.get("start")
     start_time = parser.isoparse(start_time_str).astimezone(timezone.utc)
+    end_time = start_time + timedelta(minutes=30)
 
-    # Verificar si ya existe una cita exactamente en esa hora UTC
-    existing = collection.find_one({"start": start_time})
-    if existing:
+    # Verificar si ya existe alguna cita en ese rango
+    conflict = collection.find_one({
+        "start": {
+            "$gte": start_time,
+            "$lt": end_time
+        }
+    })
+
+    if conflict:
         return "duplicate", None
 
     # Insertar si no hay conflicto
     validated_appointment_json = appointment.model_dump()
-
-    # Reescribimos el campo start como UTC
     validated_appointment_json["start"] = start_time
 
     result = collection.insert_one(validated_appointment_json)
@@ -39,12 +44,18 @@ def WriteAppointment(appointment_dict: dict):
         return "errorInserting", None
 
 def GetAppointmentsByStart(start: str):
-    # Convertir a UTC antes de buscar
     try:
+        # Convertir a UTC y calcular rango de 30 minutos
         start_time = parser.isoparse(start).astimezone(timezone.utc)
+        end_time = start_time + timedelta(minutes=30)
     except Exception as e:
         print("Error parsing start time:", e)
         return []
 
-    citas = list(collection.find({"start": start_time}))
+    citas = list(collection.find({
+        "start": {
+            "$gte": start_time,
+            "$lt": end_time
+        }
+    }))
     return citas
