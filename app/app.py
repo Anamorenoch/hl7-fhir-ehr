@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 import uvicorn
 from app.controlador.PatientCrud import GetPatientById,WritePatient,GetPatientByIdentifier
-from app.controlador.appointmentCrud import WriteAppointment,collection,GetAppointmentsByStart
+from app.controlador.appointmentCrud import WriteAppointment
 from app.controlador.encounterCrud import WriteEncounter
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -55,14 +55,6 @@ async def add_appointment(request: Request):
     else:
         raise HTTPException(status_code=500, detail=f"Error de validación: {status}")
         
-@app.get("/appointment")
-async def get_appointments(start: str):
-    print("Recibida solicitud con start:", start)
-    resultado = collection.find_one({"start": start})
-    if not resultado:
-        return JSONResponse(content={"entry": []})  # respuesta vacía válida
-    return JSONResponse(content={"entry": [convert_bson(resultado)]})
-
 
 @app.post("/encounter", response_model=dict)
 async def add_encounter(request: Request):
