@@ -54,7 +54,6 @@ async def add_appointment(request: Request):
         return {"_id": appointment_id}  # Retorna el ID de la cita
     else:
         raise HTTPException(status_code=500, detail=f"Error de validación: {status}")
-        
 
 @app.post("/encounter", response_model=dict)
 async def add_encounter(request: Request):
