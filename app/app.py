@@ -56,7 +56,7 @@ async def add_appointment(request: Request):
         raise HTTPException(status_code=500, detail=f"Error de validación: {status}")
         
 @app.get("/appointment")
-def get_appointments(start: str):
+async def get_appointments(start: str):
     citas = GetAppointmentsByStart(start)
     if citas:
         return {"entry": citas}
