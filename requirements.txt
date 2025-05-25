@@ -5,4 +5,3 @@ uvicorn
 sqlalchemy
 pydantic
 gunicorn
-python-dateutil
