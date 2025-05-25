@@ -18,22 +18,22 @@ def WriteAppointment(appointment_dict: dict):
     # Convertir 'start' a datetime en UTC
     start_time_str = appointment_dict.get("start")
     start_time = parser.isoparse(start_time_str).astimezone(timezone.utc)
-    end_time = start_time + timedelta(minutes=30)
+    end_time = start_time + timedelta(minutes=30) 
 
-    # Verificar si ya existe alguna cita en ese rango
+    #Verificar si ya existe una cita en ese rango
     conflict = collection.find_one({
-        "start": {
-            "$gte": start_time,
-            "$lt": end_time
-        }
+        "start": {"$lt": end_time},
+        "end": {"$gt": start_time}
     })
-
+ 
     if conflict:
         return "duplicate", None
 
     # Insertar si no hay conflicto
     validated_appointment_json = appointment.model_dump()
     validated_appointment_json["start"] = start_time
+    validated_appointment_json["end"] = end_time
+
 
     result = collection.insert_one(validated_appointment_json)
 
