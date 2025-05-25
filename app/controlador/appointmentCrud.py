@@ -43,19 +43,3 @@ def WriteAppointment(appointment_dict: dict):
     else:
         return "errorInserting", None
 
-def GetAppointmentsByStart(start: str):
-    try:
-        # Convertir a UTC y calcular rango de 30 minutos
-        start_time = parser.isoparse(start).astimezone(timezone.utc)
-        end_time = start_time + timedelta(minutes=30)
-    except Exception as e:
-        print("Error parsing start time:", e)
-        return []
-
-    citas = list(collection.find({
-        "start": {
-            "$gte": start_time,
-            "$lt": end_time
-        }
-    }))
-    return citas
