@@ -29,3 +29,7 @@ def WriteAppointment(appointment_dict: dict):
         return "success", inserted_id
     else:
         return "errorInserting", None
+# appointmentCrud.py
+def GetAppointmentsByStart(start: str):
+    citas = list(collection.find({"start": start}))
+    return citas
