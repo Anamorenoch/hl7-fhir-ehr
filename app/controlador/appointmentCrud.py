@@ -13,7 +13,22 @@ def WriteAppointment(appointment_dict: dict):
         print("Error validando appointment:", e)
         return f"errorValidating: {str(e)}", None
 
-    # Convertir a diccionario limpio y guardar en MongoDB
+    # Extraer la hora de inicio
+    try:
+        appointment_start = appointment.start
+    except Exception as e:
+        print("Error extrayendo hora de la cita:", e)
+        return f"errorExtractingStart: {str(e)}", None
+
+    # Verificar si ya hay una cita a esa hora
+    existing_appointment = collection.find_one({
+        "start": appointment_start
+    })
+
+    if existing_appointment:
+        return "appointmentTimeTaken", None
+
+    # Guardar cita nueva
     validated_appointment_json = appointment.model_dump()
     result = collection.insert_one(validated_appointment_json)
 
