@@ -50,10 +50,14 @@ async def add_patient(request: Request):
 async def add_appointment(request: Request):
     new_appointment_dict = dict(await request.json())
     status, appointment_id = WriteAppointment(new_appointment_dict)
+    
     if status == 'success':
-        return {"_id": appointment_id}  # Retorna el ID de la cita
+        return {"_id": appointment_id}
+    elif status == 'duplicate':
+        raise HTTPException(status_code=409, detail="Ya hay una cita en esa hora.")
     else:
         raise HTTPException(status_code=500, detail=f"Error de validación: {status}")
+
 
 @app.post("/encounter", response_model=dict)
 async def add_encounter(request: Request):
